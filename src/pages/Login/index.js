@@ -11,6 +11,7 @@ import feiraImg from '../../assets/feira.svg';
 
 export default function Login() {
    const [id, setId] = useState('');
+   const [password, setPassword] = useState('');
    const history = useHistory();
 
    async function handleLogin(event) {
@@ -43,8 +44,8 @@ export default function Login() {
                />
                <input 
                   placeholder="Sua senha" 
-                  value={id}
-                  onChange={e => setId(e.target.value)}
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
                />
                <button className="button" type="submit">Entrar</button>
 
@@ -55,7 +56,7 @@ export default function Login() {
             </form>
          </section>
 
-         <img src={feiraImg} alt="Feira" />         
+         <img src={feiraImg} alt="Feira" className="imgFeira" />         
       </div>
    )
 }
