@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { FiArrowLeft } from 'react-icons/fi';
-import Select from 'react-select';
 
 import api from '../../services/api';
 import './styles.css';
@@ -19,12 +18,6 @@ export default function NewIncident() {
    const [products, setProducts] = useState('');
    const [type, setType] = useState('');
    const [address, setAddress] = useState('');
-
-   const optionsUF = [
-      { value: 'RJ', label: 'RJ' },
-      { value: 'MG', label: 'MG' },
-      { value: 'SP', label: 'SP' }
-   ];
 
    const history = useHistory();
 
@@ -92,33 +85,40 @@ export default function NewIncident() {
                   onChange={e => setPassword(e.target.value)}
                />
                <div className="input-group">
-                  <input 
-                     placeholder="UF *" 
-                     style={{ width: 80 }} 
-                     value={uf}
-                     onChange={e => setUf(e.target.value)}   
-                  />
-                  <input 
-                     placeholder="Cidade *" 
+                  <select 
+                     className="uf"
+                     value={uf} 
+                     onChange={e => setUf(e.target.value)}>
+                        <option value="" disabled defaultValue>UF *</option>
+                        <option value="MG">MG</option>
+                        <option value="RJ">RJ</option>
+                        <option value="SP">SP</option>
+                  </select>
+                  <select 
+                     className="city"
                      value={city}
-                     onChange={e => setCity(e.target.value)}   
-                  />
+                     onChange={e => setCity(e.target.value)}>
+                        <option value="" disabled defaultValue>Cidade *</option>
+                  </select>
                </div>
-               <input 
-                  placeholder="Bairro *" 
+               <select 
+                  className="neighborhood"
                   value={neighborhood}
-                  onChange={e => setNeighborhood(e.target.value)}   
-               />
-               <input 
-                  placeholder="Produtos *" 
+                  onChange={e => setNeighborhood(e.target.value)}>
+                     <option value="" disabled defaultValue>Bairro *</option>
+               </select>
+               <select 
+                  className="products"
                   value={products}
-                  onChange={e => setProducts(e.target.value)}
-               />
-               <input 
-                  placeholder="Tipo *" 
+                  onChange={e => setProducts(e.target.value)}>
+                     <option value="" disabled defaultValue>Produtos *</option>
+               </select>
+               <select 
+                  className="type"
                   value={type}
-                  onChange={e => setType(e.target.value)}
-               />
+                  onChange={e => setType(e.target.value)}>
+                     <option value="" disabled defaultValue>Tipo *</option>
+               </select>
                <input 
                   placeholder="Endereço *" 
                   value={address}

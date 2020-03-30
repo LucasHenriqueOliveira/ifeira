@@ -1,9 +1,7 @@
 .register-container {
     width: 100%;
     max-width: 1120px;
-    height: 100vh;
     margin: 0 auto;
- 
     display: flex;
     align-items: center;
     justify-content: center;
@@ -11,7 +9,7 @@
  
  .register-container .content {
     width: 100%;
-    padding: 96px;
+    padding: 50px;
     background: #f0f0f5;
     box-shadow: 0 0 100px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
@@ -57,3 +55,33 @@
  .register-container .content section img {
    width: 50%;
  }
+
+.register-container .content form .input-group .uf, 
+.register-container .content form .input-group .city,
+.register-container .content form .neighborhood,
+.register-container .content form .products,
+.register-container .content form .type {
+   height: 60px;
+   color: #6e6e75;
+   border-radius: 8px;
+   border: 2px solid transparent;
+   transition: border 0.2s ease-in-out;
+   background-color: #fff;
+   margin-top: 7px;
+   text-indent: 15px;
+}
+
+.register-container .content form .input-group .uf {
+   width: 30%;
+   margin-right: 5px;
+}
+
+.register-container .content form .input-group .city {
+   width: 70%;
+}
+
+.register-container .content form .neighborhood,
+.register-container .content form .products,
+.register-container .content form .type {
+   width: 100%;
+}
