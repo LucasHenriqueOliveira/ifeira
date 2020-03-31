@@ -150,6 +150,8 @@ export default function Register() {
 
    const products = [
       'Hortifruti',
+      'Verduras',
+      'Frutas'
    ];
 
    const types = [
