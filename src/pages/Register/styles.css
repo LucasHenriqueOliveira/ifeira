@@ -89,15 +89,12 @@
    border-radius: 8px;
    margin: 10px;
    margin-bottom: 0;
+   margin-left: 0;
 }
 
 .register-container .content form .input-group .uf,
 .register-container .content form .input-group .city {
    height: 55px;
-}
-
-.register-container .content form .input-group .city {
-   margin-left: 20px;
 }
 
 .register-container .content form .input-group label {
@@ -109,10 +106,38 @@
    color: rgba(0, 0, 0, 0.54) !important;
 }
 
+.makeStyles-selectUF-2 .MuiFormLabel-root,
+.makeStyles-selectCity-3 .MuiFormLabel-root,
+.makeStyles-selectNeighborhood-4 .MuiFormLabel-root,
+.makeStyles-selectProducts-5 .MuiFormLabel-root,
+.makeStyles-selectType-6 .MuiFormLabel-root {
+   margin-left: 15px !important;
+}
+
+.makeStyles-selectUF-2 .MuiSelect-select {
+   margin-left: 10px !important;
+}
+
+.makeStyles-selectNeighborhood-4 .MuiSelect-select,
+.makeStyles-selectProducts-5 .MuiSelect-select,
+.makeStyles-selectType-6 .MuiSelect-select {
+   margin-left: 0 !important;
+}
+
+.makeStyles-selectCity-3 {
+   margin-right: 0 !important;
+   margin-left: 10px !important;
+}
+
 
 @media (max-width: 1280px) {}
 
-@media (max-width: 1024px) {}
+@media (max-width: 1024px) {
+   .register-container .content form {
+      width: 100%;
+      max-width: 400px;
+   }
+}
 
 @media (max-width: 768px) {
    
@@ -163,6 +188,11 @@
    .makeStyles-selectCity-3 {
       margin-right: 0 !important;
       margin-left: 10px !important;
+   }
+
+   .register-container .content form {
+      width: 100%;
+      max-width: 360px;
    }
 }
 
