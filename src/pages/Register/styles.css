@@ -40,10 +40,6 @@
     max-width: 450px;
  }
  
- .register-container .content form input {
-    margin-top: 8px;
- }
- 
  .register-container .content form .input-group {
     display: flex;   
  }
@@ -56,8 +52,6 @@
    width: 50%;
  }
 
-.register-container .content form .input-group .uf, 
-.register-container .content form .input-group .city,
 .register-container .content form .neighborhood,
 .register-container .content form .products,
 .register-container .content form .type {
@@ -71,17 +65,43 @@
    text-indent: 15px;
 }
 
-.register-container .content form .input-group .uf {
-   width: 30%;
-   margin-right: 5px;
-}
-
 .register-container .content form .input-group .city {
-   width: 70%;
+   width: 75%;
 }
 
 .register-container .content form .neighborhood,
 .register-container .content form .products,
 .register-container .content form .type {
    width: 100%;
+}
+
+.register-container .content form .name,
+.register-container .content form .email,
+.register-container .content form .whatsapp, 
+.register-container .content form .password,
+.register-container .content form .address,
+.register-container .content form .neighborhood,
+.register-container .content form .products,
+.register-container .content form .type,
+.register-container .content form .input-group .uf,
+.register-container .content form .input-group .city {
+   width: 100%;
+   background-color: #fff;
+   border-radius: 8px;
+   margin: 10px;
+   margin-bottom: 0;
+}
+
+.register-container .content form .input-group .uf,
+.register-container .content form .input-group .city {
+   height: 55px;
+}
+
+.register-container .content form .input-group .city {
+   margin-left: 20px;
+}
+
+.register-container .content form .input-group label {
+   margin-top: 7px;
+   z-index: 1;
 }
