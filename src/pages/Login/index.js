@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { FiLogIn } from 'react-icons/fi';
+import { makeStyles } from '@material-ui/core/styles';
+import TextField from '@material-ui/core/TextField';
 
 import api from '../../services/api';
 
@@ -9,10 +11,23 @@ import './styles.css';
 import logoImg from '../../assets/logo.png';
 import feiraImg from '../../assets/feira.svg';
 
+
+const useStyles = makeStyles((theme) => ({
+   root: {
+      '& .MuiOutlinedInput-root': {
+         '& fieldset': {
+           border: 'none'
+         }
+      }
+   },
+}));
+
 export default function Login() {
    const [id, setId] = useState('');
    const [password, setPassword] = useState('');
    const history = useHistory();
+
+   const classes = useStyles();
 
    async function handleLogin(event) {
       event.preventDefault();
@@ -34,16 +49,21 @@ export default function Login() {
          <section className="form">
             <img src={logoImg} alt="Be The Hero"/>
 
-            <form onSubmit={handleLogin}>
+            <form className={classes.root} onSubmit={handleLogin}>
                <h1>Faça seu login</h1>
 
-               <input 
-                  placeholder="Seu celular ou email" 
+               <TextField
+                  className="id"
+                  label="Seu celular ou email"
+                  variant="outlined"
                   value={id}
                   onChange={e => setId(e.target.value)}
                />
-               <input 
-                  placeholder="Sua senha" 
+
+               <TextField
+                  className="password"
+                  label="Sua senha"
+                  variant="outlined"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                />
