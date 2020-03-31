@@ -47,26 +47,6 @@ button {
   border: 0;
 }
 
-form input {
-   width: 100%;
-   height: 60px;
-   color: #333;
-   border: 1px solid #dcdce6;
-   border-radius: 8px;
-   padding: 0 24px;
-}
-
-form input,
-form textarea {
-  border: 2px solid transparent;
-  transition: border 0.2s ease-in-out;
-}
-
-form input:focus,
-form textarea:focus {
-  border: 2px solid var(--primary-color);
-}
-
 .button {
   width: 100%;
   height: 60px;

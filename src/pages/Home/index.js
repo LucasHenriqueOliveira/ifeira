@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { FiCornerDownRight } from 'react-icons/fi';
-
+import { makeStyles } from '@material-ui/core/styles';
+import TextField from '@material-ui/core/TextField';
 import api from '../../services/api';
 
 import './styles.css';
@@ -9,9 +10,23 @@ import './styles.css';
 import logoImg from '../../assets/logo.png';
 import feiraImg from '../../assets/feira2.svg';
 
+const useStyles = makeStyles((theme) => ({
+    root: {
+       '& .MuiOutlinedInput-root': {
+          '& fieldset': {
+            border: 'none'
+          }
+       },
+       '& .MuiFormLabel-root.Mui-focused': {
+            color: 'transparent'
+       }
+    },
+}));
+
 export default function Home() {
    const [id, setId] = useState('');
    const history = useHistory();
+   const classes = useStyles();
 
    async function handleSearch(event) {
       event.preventDefault();
@@ -40,10 +55,12 @@ export default function Home() {
                         <p>
                             Descubra os feirantes disponíveis para você...
                         </p>
-                        <div className="hero_btn-continer">
-                            <form className="formSearch" onSubmit={handleSearch}>
-                                <input 
-                                    placeholder="Digite o seu bairro" 
+                        <div className="hero_btn-container">
+                            <form className={classes.root} onSubmit={handleSearch}>
+                                <TextField
+                                    className="neighborhood"
+                                    label="Digite o seu bairro"
+                                    variant="outlined"
                                     value={id}
                                     onChange={e => setId(e.target.value)}
                                 />
