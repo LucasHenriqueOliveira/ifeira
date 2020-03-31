@@ -138,8 +138,8 @@
    margin-top: 3px;
 }
 
-.MuiFormLabel-root.Mui-focused {
-    color: rgba(0, 0, 0, 0.54) !important;
+.hero_btn-container  .MuiFormLabel-root.Mui-focused {
+    color: transparent !important;
 }
 
 @media (max-width: 1280px) {}

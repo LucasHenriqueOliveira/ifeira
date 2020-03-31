@@ -102,7 +102,7 @@
    z-index: 1;
 }
 
-.MuiFormLabel-root.Mui-focused {
+.register-container .MuiFormLabel-root.Mui-focused {
    color: rgba(0, 0, 0, 0.54) !important;
 }
 
