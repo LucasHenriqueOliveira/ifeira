@@ -181,9 +181,9 @@ export default function Album() {
                 </FormControl>
             </Container>
         </div>
-        <Container className={classes.cardGrid} maxWidth="md">
+        <Container className={classes.cardGrid} maxWidth="lg">
           {/* End hero unit */}
-          <Grid container spacing={4}>
+          <Grid container spacing={2}>
             {cards.map((card) => (
               <Grid item key={card.id} xs={12} sm={6} md={4}>
                 <Card className={classes.card}>
