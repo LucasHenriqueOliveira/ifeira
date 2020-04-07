@@ -1,34 +1,21 @@
 import React, { useState } from 'react';
-import AppBar from '@material-ui/core/AppBar';
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
-import CssBaseline from '@material-ui/core/CssBaseline';
 import Grid from '@material-ui/core/Grid';
-import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import logoImg from '../../assets/logo.png'; 
-import { Link } from 'react-router-dom';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
+import Footer from '../shared/Footer';
+import Header from '../shared/Header';
 
 import './styles.css';
-
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
 
 const useStyles = makeStyles((theme) => ({
   icon: {
@@ -56,10 +43,6 @@ const useStyles = makeStyles((theme) => ({
   },
   cardContent: {
     flexGrow: 1,
-  },
-  footer: {
-    backgroundColor: theme.palette.background.paper,
-    padding: theme.spacing(6),
   },
   buttons: {
     textAlign: 'center',
@@ -247,14 +230,7 @@ export default function List() {
 
   return (
     <div>
-      <CssBaseline />
-      <AppBar position="relative">
-        <Toolbar>
-            <Link className="logo" to="/">
-                <img src={logoImg} alt="Feira" />  
-            </Link>
-        </Toolbar>
-      </AppBar>
+      <Header />
       <main>
         <Container className={classes.heroContent}>
           <form className={classes.root} onSubmit={handleRegister}>
@@ -438,17 +414,7 @@ export default function List() {
           </Grid>
         </Container>
       </main>
-      {/* Footer */}
-      <footer className={classes.footer}>
-        <Typography variant="h6" align="center" gutterBottom>
-          iFeira
-        </Typography>
-        <Typography variant="subtitle1" align="center" color="textSecondary" component="p">
-          A sua feira em casa!
-        </Typography>
-        <Copyright />
-      </footer>
-      {/* End footer */}
+      <Footer />
     </div>
   );
 }
