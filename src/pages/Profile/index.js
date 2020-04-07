@@ -10,9 +10,6 @@ import Header from '../../shared/Header';
 import './styles.css';
 
 const useStyles = makeStyles((theme) => ({
-  icon: {
-    marginRight: theme.spacing(2),
-  },
   layout: {
     width: 'auto',
     marginLeft: theme.spacing(2),
