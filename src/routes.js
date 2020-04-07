@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import List from './pages/List';
 import Profile from './pages/Profile';
+import Edit from './pages/Edit';
 
 export default function Routes() {
    return (
@@ -15,6 +16,7 @@ export default function Routes() {
             <Route path='/register' component={Register} />
             <Route path='/list' component={List} />
             <Route path='/profile/:id' component={Profile} />
+            <Route path='/edit/:id' component={Edit} />
          </Switch>
       </BrowserRouter>
    )
