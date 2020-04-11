@@ -138,8 +138,8 @@
    margin-top: 3px;
 }
 
-.hero_btn-container  .MuiFormLabel-root.Mui-focused {
-    color: transparent !important;
+.MuiInputLabel-outlined.MuiInputLabel-shrink {
+    transform: translate(14px, 3px) scale(0.75) !important;
 }
 
 @media (max-width: 1280px) {}
