@@ -47,7 +47,7 @@ export default function Home() {
     const handleChangeUf = (uf) => {
         setUf(uf);
         
-        api.get('cidades/' + uf).then(response => {
+        api.get('/regioes/municipios/' + uf).then(response => {
             setCities(response);
         });
 
@@ -57,7 +57,7 @@ export default function Home() {
     const handleChangeCity = (city) => {
         setCity(city);
         
-        api.get('bairros/' + city).then(response => {
+        api.get('/regioes/bairros/' + city).then(response => {
             setNeighborhoods(response);
         });
 
