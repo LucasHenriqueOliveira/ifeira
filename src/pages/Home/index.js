@@ -7,6 +7,8 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import Grid from '@material-ui/core/Grid';
+import { useSnackbar } from 'notistack';
+import Button from '@material-ui/core/Button';
 
 import api from '../../services/api';
 import './styles.css';
@@ -36,6 +38,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Home() {
+    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
     const [neighborhood, setNeighborhood] = useState('');
     const [city, setCity] = useState('');
     const [uf, setUf] = useState('');
@@ -47,7 +50,7 @@ export default function Home() {
     const handleChangeUf = (uf) => {
         setUf(uf);
         
-        api.get('/regioes/municipios/' + uf).then(response => {
+        api.get('regioes/municipios/' + uf).then(response => {
             setCities(response);
         });
 
@@ -57,7 +60,7 @@ export default function Home() {
     const handleChangeCity = (city) => {
         setCity(city);
         
-        api.get('/regioes/bairros/' + city).then(response => {
+        api.get('regioes/bairros/' + city).then(response => {
             setNeighborhoods(response);
         });
 
@@ -66,19 +69,60 @@ export default function Home() {
 
 
     async function handleSearch(event) {
-        event.preventDefault();
+        
+        /*
+        if(!neighborhood) {
+            enqueueSnackbar('Selecione um bairro!', { 
+                variant: 'info',
+            });
+            return false;
+        }
+        */
+
+        let response = [{
+            "id": 1,
+            "nomeDaBarraca": "Barraca Brás",
+            "email": "barraca.bras@ig.com.br",
+            "telefonePrincipal": "(11)96323-4854",
+            "telefonesWhatsapp": [
+              "(11)96323-4854",
+              "(11)94354-6555",
+              "(11)94954-3323"
+            ],
+            "produtos": [
+              "legumes",
+              "frutas nacionais",
+              "frutas importadas"
+            ],
+            "tipos": [
+              "orgânicos",
+              "não orgânicos"
+            ],
+            "bairrosEntrega": [
+              "Jardins",
+              "Vila Mariana",
+              "Moema"
+            ],
+            "endereco": "Rua Além Paraíba, 120, Centro, São Paulo"
+        }];
+        
+        history.push('/list', { detail: response});
+        return false;
 
         try {
-            await api.get('feirantes/' + neighborhood).then(response => {
+            await api.get('feirantes/bairro/' + neighborhood).then(response => {
                 if(response.length) {
-                    // save list on localstorage
-                    history.push('/list');
+                    history.push('/list', { detail: response});
                 } else {
-                    console.log('Não tem bairro.');
+                    enqueueSnackbar('Não foi encontrado feirante para este bairro!', { 
+                        variant: 'info',
+                    });
                 }
             });
         } catch(error) {
-            alert(error);
+            enqueueSnackbar('Erro ao retornar os feirantes!', { 
+                variant: 'error',
+            });
         }
     }
 
@@ -151,9 +195,9 @@ export default function Home() {
                                         </FormControl>
                                     </Grid>
                                 </Grid>
-                                <Link className="call_to-btn btn_white-border" to="/">
-                                    <span>Pesquisar</span>
-                                </Link>
+                                <Button type="submit" className="call_to-btn btn_white-border" >
+                                    Pesquisar
+                                </Button>
                             </form>
 
                             <Link className="back-link" to="/login">
