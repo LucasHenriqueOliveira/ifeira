@@ -1,13 +1,13 @@
 import React from 'react';
-
-import './global.css'
-
-import Routes from './routes'
+import { SnackbarProvider } from 'notistack';
+import './global.css';
+import Routes from './routes';
 
 function App() {
   return (
-    <Routes />    
-    
+    <SnackbarProvider maxSnack={3}>
+      <Routes />    
+    </SnackbarProvider>
   );
 }
 
