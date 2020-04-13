@@ -59,7 +59,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function List() {
 	const classes = useStyles();
-	const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+	const { enqueueSnackbar } = useSnackbar();
 	const location = useLocation();
 	const [city, setCity] = useState('');
 	const [uf, setUf] = useState('');

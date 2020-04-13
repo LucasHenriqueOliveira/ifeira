@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Home() {
-    const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+    const { enqueueSnackbar } = useSnackbar();
     const [neighborhood, setNeighborhood] = useState('');
     const [city, setCity] = useState('');
     const [uf, setUf] = useState('');
