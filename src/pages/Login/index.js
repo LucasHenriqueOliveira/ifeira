@@ -3,7 +3,7 @@ import { Link, useHistory } from 'react-router-dom';
 import { FiLogIn } from 'react-icons/fi';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-
+import { useSnackbar } from 'notistack';
 import api from '../../services/api';
 
 import './styles.css';
@@ -23,7 +23,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Login() {
-   const [id, setId] = useState('');
+   const { enqueueSnackbar } = useSnackbar();
+   const [email, setEmail] = useState('');
    const [password, setPassword] = useState('');
    const history = useHistory();
 
@@ -32,15 +33,28 @@ export default function Login() {
    async function handleLogin(event) {
       event.preventDefault();
 
+      let data = {
+         email: email,
+         password: password
+      }
+
       try {
-         const response = await api.post('sessions', { id });
+         await api.post('login', data).then(response => {
+            if(response.length) {
+               localStorage.setItem('email', email);
+               localStorage.setItem('token', response.data.token);
+               history.push('/profile');
+            } else {
+               enqueueSnackbar('Feirante não encontrado!', { 
+                  variant: 'error',
+               });
+            }
+         });
 
-         localStorage.setItem('ongId', id);
-         localStorage.setItem('ongName', response.data.name);
-
-         history.push('/profile');
       } catch(error) {
-         alert(error);
+         enqueueSnackbar('Erro ao fazer login!', { 
+            variant: 'error',
+         });
       }
    }
 
@@ -56,8 +70,8 @@ export default function Login() {
                   className="id"
                   label="Seu celular ou email"
                   variant="outlined"
-                  value={id}
-                  onChange={e => setId(e.target.value)}
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
                />
 
                <TextField
