@@ -17,12 +17,19 @@ import Footer from '../../shared/Footer';
 import Header from '../../shared/Header';
 import { useSnackbar } from 'notistack';
 import api from '../../services/api';
+import TextField from '@material-ui/core/TextField';
+import Autocomplete from '@material-ui/lab/Autocomplete';
+import ExpansionPanel from '@material-ui/core/ExpansionPanel';
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
+import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import SearchIcon from '@material-ui/icons/Search';
 import './styles.css';
 
 const useStyles = makeStyles((theme) => ({
 	heroContent: {
 		backgroundColor: theme.palette.background.paper,
-		paddingTop: 10,
+		paddingTop: 0,
 		paddingBottom: 10
 	},
 	heroButtons: {
@@ -54,7 +61,20 @@ const useStyles = makeStyles((theme) => ({
 		fontSize: 12,
 		fontWeight: 700,
 		marginTop: 10,
-}
+	},
+	pesquisa: {
+		paddingTop: 0
+	},
+	filter: {
+		color: 'rgba(0, 0, 0, 0.5)'
+	},
+	iconFilter: {
+		width: 18,
+		marginRight: 2
+	},
+	heading: {
+		fontSize: 15
+	}
 }));
 
 export default function List() {
@@ -79,32 +99,48 @@ export default function List() {
 	
 	useEffect(() => {
         api.get('produtos').then(response => {
-            setProducts(response);
+            setProducts(response.data);
 		});
 		
-		api.get('tipos').then(response => {
-            setTypes(response);
+		api.get('tiposProdutos').then(response => {
+            setTypes(response.data);
 		});
     }, []);
 
 	const handleChangeUf = (uf) => {
+		let ufLowerCase = uf.toLowerCase();
 		setUf(uf);
 		
-        api.get('regioes/municipios/' + uf).then(response => {
-            setCities(response);
-        });
-    };
-
-    const handleChangeCity = (city) => {
-        setCity(city);
-        
-        api.get('regioes/bairros/' + city).then(response => {
-            setNeighborhoods(response);
+        api.get('regioes/municipios/' + ufLowerCase).then(response => {
+            let municipios = [];
+            response.data.forEach(element => {
+                municipios.push({ id: element._id, name: capitalize(element.nome_municipio)});
+            });
+            setCities(municipios);
         });
 	};
 	
+	function capitalize(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
+    const handleChangeCity = (city) => {
+        if (city) {
+            setCity(city);
+        
+            api.get('regioes/bairros/' + city.id).then(response => {
+                let bairros = [];
+                response.data.forEach(element => {
+                    bairros.push({ id: element._id, name: capitalize(element.nome)});
+                });
+                setNeighborhoods(bairros);
+            });
+        }
+	};
+	
 	const handleChangeNeighborhood = (neighborhood) => {
-        setNeighborhood(neighborhood);
+		console.log(neighborhood);
+		//setNeighborhood(neighborhood);
 	};
 
 	async function handleSearch(event) {
@@ -136,122 +172,134 @@ export default function List() {
 		}
 	}
 
+	const handleMessage = (tel) => {
+		window.open('https://api.whatsapp.com/send?phone=55'+tel+'&text=Olá!%20Gostaria%20de%20informações%20dos%20produtos.&source=&data=', '_blank');
+	}
+
 	return (
 		<div>
 		<Header />
 		<main>
-			<Container className={classes.heroContent}>
-			<form className={classes.root} onSubmit={handleSearch}>
-				<Grid container spacing={1}>
-				<Grid item xs={2} sm={2} md={2}>
-					<FormControl>
-					<InputLabel id="labelUF">UF</InputLabel>
-					<Select
-						className="uf"
-						labelId="labelUF"
-						value={uf}
-						onChange={e => handleChangeUf(e.target.value)}
-						input={<Input />}
-					>
-						{states.map((state) => (
-							<MenuItem key={state} value={state}>
-							{state}
-							</MenuItem>
-						))}
-					</Select>
-					</FormControl>
-				</Grid>
-				<Grid item xs={10} sm={5} md={5}>
-					<FormControl>
-					<InputLabel id="labelCity">Cidade</InputLabel>
-					<Select
-						className="city"
-						labelId="labelCity"
-						value={city}
-						onChange={e => handleChangeCity(e.target.value)}
-						input={<Input />}
-					>
-						{cities.map((city) => (
-							<MenuItem key={city} value={city}>
-							{city}
-							</MenuItem>
-						))}
-					</Select>
-					</FormControl>
-				</Grid>
-				<Grid item xs={12} sm={5} md={5}>
-					<FormControl>
-					<InputLabel id="labelNeighborhood">Bairro</InputLabel>
-					<Select
-						className="neighborhood"
-						labelId="labelNeighborhood"
-						value={neighborhood}
-						onChange={e => handleChangeNeighborhood(e.target.value)}
-						input={<Input />}
-					>
-						{neighborhoods.map((neighborhood) => (
-							<MenuItem key={neighborhood} value={neighborhood}>
-							{neighborhood}
-							</MenuItem>
-						))}
-					</Select>
-					</FormControl>
-				</Grid>
-				<Grid item xs={12} sm={6} md={6}>
-					<FormControl>
-					<InputLabel id="labelProducts">Categorias</InputLabel>
-					<Select
-						className="products"
-						labelId="labelProducts"
-						multiple
-						value={product}
-						onChange={e => setProduct(e.target.value)}
-						input={<Input />}
-					>
-						{products.map((product) => (
-							<MenuItem key={product} value={product}>
-							{product}
-							</MenuItem>
-						))}
-					</Select>
-					</FormControl>
-				</Grid>
-				<Grid item xs={12} sm={6} md={6}>
-					<FormControl>
-					<InputLabel id="labelType">Tipo</InputLabel>
-					<Select
-						className="type"
-						labelId="labelType"
-						multiple
-						value={type}
-						onChange={e => setType(e.target.value)}
-						input={<Input />}
-					>
-						{types.map((type) => (
-							<MenuItem key={type} value={type}>
-							{type}
-							</MenuItem>
-						))}
-					</Select>
-					</FormControl>
-				</Grid>
-				<Grid item xs={12} sm={12} md={12} className={classes.buttons}>
-					<Button
-						variant="contained"
-						color="primary"
-						type="submit"
-						className={classes.button}
-					>
-					Pesquisar
-					</Button>
-				</Grid>
-				</Grid>
-			</form>
-			</Container>
+			<ExpansionPanel>
+				<ExpansionPanelSummary
+				expandIcon={<ExpandMoreIcon />}
+				aria-controls="panel1a-content"
+				id="panel1a-header"
+				className={classes.filter}
+				>
+					<SearchIcon className={classes.iconFilter} />
+					<Typography className={classes.heading}>Pesquisa detalhada</Typography>
+				</ExpansionPanelSummary>
+				<ExpansionPanelDetails className={classes.pesquisa}>
+					<Container className={classes.heroContent}>
+						<form className={classes.root} onSubmit={handleSearch}>
+							<Grid container spacing={1}>
+							<Grid item xs={2} sm={2} md={2}>
+								<FormControl>
+								<InputLabel id="labelUF">UF</InputLabel>
+								<Select
+									className="uf"
+									labelId="labelUF"
+									value={uf}
+									onChange={e => handleChangeUf(e.target.value)}
+									input={<Input />}
+								>
+									{states.map((state) => (
+										<MenuItem key={state} value={state}>
+										{state}
+										</MenuItem>
+									))}
+								</Select>
+								</FormControl>
+							</Grid>
+							<Grid item xs={10} sm={5} md={5}>
+								<FormControl className={classes.select}>
+									<Autocomplete
+										id="city"
+										options={cities}
+										getOptionLabel={(option) => option.name}
+										style={{ width: '100%' }}
+										value={city}
+										onChange={(event, newValue) => {
+											handleChangeCity(newValue);
+										}}
+										renderInput={(params) => <TextField {...params} label="Cidade" />}
+									/>
+								</FormControl>
+							</Grid>
+							<Grid item xs={12} sm={5} md={5}>
+								<FormControl className={classes.select}>
+									<Autocomplete
+										id="bairros"
+										options={neighborhoods}
+										getOptionLabel={(option) => option.name}
+										style={{ width: '100%' }}
+										value={neighborhood}
+										onChange={(event, newValue) => {
+											setNeighborhood(newValue);
+										}}
+										renderInput={(params) => <TextField {...params} label="Bairro" />}
+									/>
+								</FormControl>
+							</Grid>
+							<Grid item xs={12} sm={6} md={6}>
+								<FormControl>
+								<InputLabel id="labelProducts">Produto</InputLabel>
+								<Select
+									className="products"
+									labelId="labelProducts"
+									multiple
+									value={product}
+									onChange={e => setProduct(e.target.value)}
+									input={<Input />}
+								>
+									{products.map((product) => (
+										<MenuItem key={product._id} value={product._id}>
+										{product.descricao}
+										</MenuItem>
+									))}
+								</Select>
+								</FormControl>
+							</Grid>
+							<Grid item xs={12} sm={6} md={6}>
+								<FormControl>
+								<InputLabel id="labelType">Tipo</InputLabel>
+								<Select
+									className="type"
+									labelId="labelType"
+									multiple
+									value={type}
+									onChange={e => setType(e.target.value)}
+									input={<Input />}
+								>
+									{types.map((type) => (
+										<MenuItem key={type._id} value={type._id}>
+										{type.descricao}
+										</MenuItem>
+									))}
+								</Select>
+								</FormControl>
+							</Grid>
+							<Grid item xs={12} sm={12} md={12} className={classes.buttons}>
+								<Button
+									variant="contained"
+									color="primary"
+									type="submit"
+									className={classes.button}
+								>
+								Pesquisar
+								</Button>
+							</Grid>
+							</Grid>
+						</form>
+						</Container>
+				</ExpansionPanelDetails>
+			</ExpansionPanel>
+			
 			<Container className={classes.cardGrid} maxWidth="lg">
 			<Grid container spacing={2}>
 				{feirantes.map((feirante) => (
-				<Grid item key={feirante.id} xs={12} sm={6} md={4}>
+				<Grid item key={feirante._id} xs={12} sm={6} md={4}>
 					<Card className={classes.card}>
 					<CardContent className={classes.cardContent}>
 						<Typography gutterBottom variant="h5" component="h2">
@@ -275,11 +323,11 @@ export default function List() {
 
 						<div>
 							<Typography className={classes.legend}>
-								Categorias
+								Produtos
 							</Typography>
 							{(feirante.produtos).map((produto, index) => (
 								<Typography key={index} className="text">
-									{produto}
+									{produto.descricao}
 									{ ((feirante.produtos.length - 1) !== index) ? ', ': '' }
 								</Typography>
 							))}
@@ -289,10 +337,10 @@ export default function List() {
 							<Typography className={classes.legend}>
 								Tipos
 							</Typography>
-							{(feirante.tipos).map((tipo, index) => (
+							{(feirante.tiposDeProdutos).map((tipo, index) => (
 								<Typography key={index} className="text">
-									{tipo}
-									{ ((feirante.tipos.length - 1) !== index) ? ', ': '' }
+									{tipo.descricao}
+									{ ((feirante.tiposDeProdutos.length - 1) !== index) ? ', ': '' }
 								</Typography>
 							))}
 						</div>
@@ -301,28 +349,30 @@ export default function List() {
 							<Typography className={classes.legend}>
 								Bairros
 							</Typography>
-							{(feirante.bairrosEntrega).map((bairro, index) => (
+							{(feirante.bairrosDeEntrega).map((bairro, index) => (
 								<Typography key={index} className="text">
-									{bairro}
-									{ ((feirante.bairrosEntrega.length - 1) !== index) ? ', ': '' }
+									{bairro.nome}
+									{ ((feirante.bairrosDeEntrega.length - 1) !== index) ? ', ': '' }
 								</Typography>
 							))}
 							
 						</div>
 
-						<div>
-							<Typography className={classes.legend}>
-								Atendimento Local
-							</Typography>
-							<Typography className="text">
-								{feirante.endereco}
-							</Typography>
-							
-						</div>
+						{ feirante.enderecoLocalDeAtendimento && (
+							<div>
+								<Typography className={classes.legend}>
+									Atendimento Local
+								</Typography>
+								<Typography className="text">
+									{feirante.enderecoLocalDeAtendimento}
+								</Typography>
+								
+							</div>
+						)}
 					</CardContent>
 					<CardActions>
-						<Button size="small" color="primary">
-						Envie uma mensagem
+						<Button size="small" onClick={() => handleMessage(feirante.telefonePrincipal)} color="primary">
+							Envie uma mensagem
 						</Button>
 					</CardActions>
 					</Card>

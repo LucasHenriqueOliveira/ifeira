@@ -35,25 +35,33 @@ export default function Login() {
 
       let data = {
          email: email,
-         password: password
+         senha: password
       }
 
       try {
-         await api.post('login', data).then(response => {
-            if(response.length) {
-               localStorage.setItem('email', email);
+         await api.post('sessions', data).then(response => {
+            if(response.data.hasOwnProperty('token')) {
+               localStorage.setItem('dados', response.data.dados);
                localStorage.setItem('token', response.data.token);
                history.push('/profile');
             } else {
                enqueueSnackbar('Feirante não encontrado!', { 
                   variant: 'error',
+                  anchorOrigin: {
+                     vertical: 'top',
+                     horizontal: 'center',
+                 }
                });
             }
          });
 
       } catch(error) {
-         enqueueSnackbar('Erro ao fazer login!', { 
+         enqueueSnackbar('Email ou senha inválidos!', { 
             variant: 'error',
+            anchorOrigin: {
+               vertical: 'top',
+               horizontal: 'center',
+            }
          });
       }
    }
@@ -68,7 +76,8 @@ export default function Login() {
 
                <TextField
                   className="id"
-                  label="Seu celular ou email"
+                  label="Seu email"
+                  type="email"
                   variant="outlined"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
@@ -78,6 +87,7 @@ export default function Login() {
                   className="password"
                   label="Sua senha"
                   variant="outlined"
+                  type="password"
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                />

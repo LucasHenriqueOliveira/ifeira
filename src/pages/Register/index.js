@@ -1,16 +1,20 @@
 import React, { useState } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { FiArrowLeft } from 'react-icons/fi';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
-import Input from '@material-ui/core/Input';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
-import TextField from '@material-ui/core/TextField';
+import { makeStyles } from '@material-ui/core/styles';
 import api from '../../services/api';
+import { useSnackbar } from 'notistack';
+import Stepper from '@material-ui/core/Stepper';
+import Step from '@material-ui/core/Step';
+import StepLabel from '@material-ui/core/StepLabel';
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+import Dados from './Dados';
+import Bairros from './Bairros';
+import Produtos from './Produtos';
+import { useForm } from "react-hooks-helper";
+import Paper from '@material-ui/core/Paper';
 import './styles.css';
-
 import logoImg from '../../assets/logo.png';
 
 const useStyles = makeStyles((theme) => ({
@@ -19,7 +23,8 @@ const useStyles = makeStyles((theme) => ({
          '& fieldset': {
            border: 'none'
          }
-      }
+      },
+      backgroundColor: '#fff'
    },
    selectUF: {
       '& .MuiSelect-select': {
@@ -91,119 +96,179 @@ const useStyles = makeStyles((theme) => ({
       width: '100%',
       marginRight: 10
    },
+   divider: {
+      marginTop: 10
+   },
+   backButton: {
+      marginRight: theme.spacing(1),
+   },
+   buttons: {
+      textAlign: 'center',
+      marginBottom: 20
+   },
+   fim: {
+      padding: '0 20px',
+      textAlign: 'center',
+      marginTop: 20
+   }
 }));
 
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-   PaperProps: {
-      style: {
-         maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-         width: 250,
-      },
-   },
-};
+const defaultData = {
+	nome: '',
+	email: '',
+	whatsapp: '',
+   senha: '',
+   endereco: '',
+   bairros: [],
+   products: [],
+   types: [],
+   local: false
+}
 
-function getStyles(name, personName, theme) {
-   return {
-     fontWeight:
-       personName.indexOf(name) === -1
-         ? theme.typography.fontWeightRegular
-         : theme.typography.fontWeightMedium,
-   };
- }
+const steps = ['Dados', 'Bairros', 'Produtos'];
 
 export default function Register() {
-   const [name, setName] = useState('');
-   const [email, setEmail] = useState('');
-   const [whatsapp, setWhatsapp] = useState('');
-   const [password, setPassword] = useState('');
-   const [city, setCity] = useState('');
-   const [uf, setUf] = useState('');
-   const [neighborhood, setNeighborhood] = useState([]);
-   const [product, setProduct] = useState([]);
-   const [type, setType] = useState([]);
-   const [address, setAddress] = useState('');
-
+   const { enqueueSnackbar } = useSnackbar();
+   const classes = useStyles();
+   const [formData, setForm] = useForm(defaultData);
+	const [activeStep, setActiveStep] = useState(0);
+   const props = { formData, setForm };
    const history = useHistory();
 
-   const states = [
-      'MG',
-      'RJ',
-      'SP',
-   ];
-
-   const cities = ['Rio de Janeiro'];
-
-   const neighborhoods = [
-      'Oliver Hansen',
-      'Van Henry',
-      'April Tucker',
-      'Ralph Hubbard',
-      'Omar Alexander',
-      'Carlos Abbott',
-      'Miriam Wagner',
-      'Bradley Wilkerson',
-      'Virginia Andrews',
-      'Kelly Snyder',
-   ];
-
-   const products = [
-      'Hortifruti',
-      'Verduras',
-      'Frutas'
-   ];
-
-   const types = [
-      'Orgânicos',
-      'Não Orgânicos'
-   ];
-
-   const classes = useStyles();
-   const theme = useTheme();
-
-   /*
-   const handleChangeMultiple = (event) => {
-      const { options } = event.target;
-      const value = [];
-      for (let i = 0, l = options.length; i < l; i += 1) {
-         if (options[i].selected) {
-         value.push(options[i].value);
-         }
-      }
-      setPersonName(value);
-   };
-   */
-
-   async function handleRegister(event) {
-      event.preventDefault();
-
-      const data = {
-         name, 
-         email, 
-         whatsapp,
-         password,
-         city,
-         uf,
-         neighborhood,
-         product,
-         type,
-         address
-      };
-
-      try {
-         const response = await api.post('ongs', data);
-
-         alert(`Aqui está seu ID de acesso: ${response.data.id} `);
-         history.push('/');
-      } catch(error) {
-         alert('Erro ao cadastrar, tente novamente.');
+   const getStepContent = (step) => {
+      switch (step) {
+         case 0:
+            return <Dados {...props} />;
+         case 1:
+            return <Bairros {...props} onChangeBairros={handleChangeBairros} />;
+         case 2:
+            return <Produtos {...props} onChangeProdutos={handleChangeProdutos}  onChangeTiposProdutos={handleChangeTiposProdutos} />;
+         default:
+            throw new Error('Unknown step');
       }
    }
 
+   const handleChangeBairros = (arr, type) => {
+      if(type === 'add') {
+         formData.bairros.push(arr);
+      } else {
+         let bairros = formData.products.filter(function( obj ) {
+            return obj.id !== arr.id;
+         });
+         formData.bairros = bairros;
+      }
+   }
+
+   const handleChangeProdutos = (obj) => {
+      obj.checked = !obj.checked;
+      const found = formData.products.some(el => el.id === obj.id);
+      if (!found){
+         formData.products.push(obj);
+      } else {
+         formData.products.forEach((element, index) => {
+            if (element.id === obj.id) {
+               formData.products[index].checked = obj.checked;
+            }
+         });
+      }
+   }
+
+   const handleChangeTiposProdutos = (obj) => {
+      obj.checked = !obj.checked;
+      const found = formData.types.some(el => el.id === obj.id);
+      if (!found){
+         formData.types.push(obj);
+      } else {
+         formData.types.forEach((element, index) => {
+            if (element.id === obj.id) {
+               formData.types[index].checked = obj.checked;
+            }
+         });
+      }
+   }
+
+   const handleNext = (event) => {
+		if (activeStep + 1 === steps.length) {
+			submit(event);
+		} else {
+			setActiveStep(activeStep + 1);
+		}
+	};
+
+   const handleBack = () => {
+		setActiveStep(activeStep - 1);
+	};
+
+   async function submit(event) {
+      event.preventDefault();
+
+      if (!formData.nome || !formData.email || !formData.whatsapp || !formData.senha 
+         || formData.bairros.length === 0 || formData.products.length === 0 || formData.types.length === 0) {
+            enqueueSnackbar('Favor preencher os dados obrigatórios!', { 
+               variant: 'error',
+               anchorOrigin: {
+                  vertical: 'top',
+                  horizontal: 'center',
+                 },
+            });
+            return false;
+      }
+
+      let produtos = [];
+      formData.products.forEach(element => {
+         if (element.checked) {
+            produtos.push(element._id);
+         }
+      });
+
+      let tipos = [];
+      formData.types.forEach(element => {
+         if (element.checked) {
+            tipos.push(element._id);
+         }
+      });
+
+      let bairros = [];
+      formData.bairros.forEach(element => {
+         bairros.push(element.id);
+      });
+
+      const data = {
+         nomeDaBarraca: formData.nome,
+         email: formData.email,
+         telefonePrincipal: formData.whatsapp,
+         telefonesWhatsapp: [formData.whatsapp],
+         produtos: produtos,
+         tiposDeProdutos: tipos,
+         bairrosDeEntrega: bairros,
+         senha: formData.senha,
+         enderecoLocalDeAtendimento: formData.endereco
+      }
+
+      try {
+         await api.post('feirante', data).then(response => {
+				setActiveStep(activeStep + 1);
+			});
+      } catch(error) {
+         enqueueSnackbar('Erro ao salvar os dados!', { 
+				variant: 'error',
+				anchorOrigin: {
+					vertical: 'top',
+					horizontal: 'center',
+			  	},
+			});
+      }
+   }
+
+   const handleLogin = (event) => {
+		event.preventDefault();
+		history.push('/login');
+	};
+
+
    return (
-      <div className="register-container">
-         <div className="content">
+      <main className="register-container">
+         <Paper className="content">
             <section>
                <img src={logoImg} alt="Register"/>
 
@@ -216,142 +281,50 @@ export default function Register() {
                </Link>            
             </section>
 
-            <form className={classes.root} onSubmit={handleRegister}>
-               <TextField
-                  className="name"
-                  label="Nome da barraca *"
-                  variant="outlined"
-                  value={name}
-                  onChange={e => setName(e.target.value)}
-               />
-               <TextField 
-                  type="email" 
-                  className="name"
-                  label="E-mail"
-                  variant="outlined"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-               />
-               <TextField 
-                  className="whatsapp"
-                  label="WhatsApp"
-                  variant="outlined"
-                  value={whatsapp}
-                  onChange={e => setWhatsapp(e.target.value)}
-               />
-               <TextField 
-                  className="password"
-                  label="Senha *"
-                  type="password" 
-                  variant="outlined"
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-               />
-               <div className="input-group">
-                  <FormControl className={classes.selectUF}>
-                     <InputLabel id="labelUF">UF</InputLabel>
-                     <Select
-                        className="uf"
-                        labelId="labelUF"
-                        value={uf}
-                        onChange={e => setUf(e.target.value)}
-                        input={<Input />}
-                        MenuProps={MenuProps}
-                        disableUnderline={true}
-                     >
-                        {states.map((state) => (
-                           <MenuItem key={state} value={state} style={getStyles(state, uf, theme)}>
-                           {state}
-                           </MenuItem>
-                        ))}
-                     </Select>
-                  </FormControl>
-                  <FormControl className={classes.selectCity}>
-                     <InputLabel id="labelCity">Cidade</InputLabel>
-                     <Select
-                        className="city"
-                        labelId="labelCity"
-                        value={city}
-                        onChange={e => setCity(e.target.value)}
-                        input={<Input />}
-                        MenuProps={MenuProps}
-                        disableUnderline={true}
-                     >
-                        {cities.map((city) => (
-                           <MenuItem key={city} value={city} style={getStyles(city, uf, theme)}>
-                           {city}
-                           </MenuItem>
-                        ))}
-                     </Select>
-                  </FormControl>
-               </div>
-               <FormControl className={classes.selectNeighborhood}>
-                  <InputLabel id="labelNeighborhood">Bairro</InputLabel>
-                  <Select
-                     className="neighborhood"
-                     labelId="labelNeighborhood"
-                     multiple
-                     value={neighborhood}
-                     onChange={e => setNeighborhood(e.target.value)}
-                     input={<Input />}
-                     MenuProps={MenuProps}
-                     disableUnderline={true}
-                  >
-                     {neighborhoods.map((neighborhood) => (
-                        <MenuItem key={neighborhood} value={neighborhood} style={getStyles(neighborhood, neighborhood, theme)}>
-                        {neighborhood}
-                        </MenuItem>
-                     ))}
-                  </Select>
-               </FormControl>
-               <FormControl className={classes.selectProducts}>
-                  <InputLabel id="labelProducts">Produtos</InputLabel>
-                  <Select
-                     className="products"
-                     labelId="labelProducts"
-                     multiple
-                     value={product}
-                     onChange={e => setProduct(e.target.value)}
-                     input={<Input />}
-                     MenuProps={MenuProps}
-                     disableUnderline={true}
-                  >
-                     {products.map((product) => (
-                        <MenuItem key={product} value={product} style={getStyles(product, product, theme)}>
-                        {product}
-                        </MenuItem>
-                     ))}
-                  </Select>
-               </FormControl>
-               <FormControl className={classes.selectType}>
-                  <InputLabel id="labelType">Tipo</InputLabel>
-                  <Select
-                     className="type"
-                     labelId="labelType"
-                     multiple
-                     value={type}
-                     onChange={e => setType(e.target.value)}
-                     input={<Input />}
-                     MenuProps={MenuProps}
-                     disableUnderline={true}
-                  >
-                     {types.map((type) => (
-                        <MenuItem key={type} value={type} style={getStyles(type, type, theme)}>
-                        {type}
-                        </MenuItem>
-                     ))}
-                  </Select>
-               </FormControl>
-               <TextField 
-                  className="address"
-                  variant="outlined"
-                  label="Endereço *" 
-                  value={address}
-                  onChange={e => setAddress(e.target.value)}
-               />
-               <button className="button" type="submit">Cadastrar</button>
+            <form className={classes.root}>
+               <Stepper activeStep={activeStep} alternativeLabel>
+                  {steps.map((label) => (
+					      <Step key={label}>
+						      <StepLabel>{label}</StepLabel>
+					      </Step>
+                  ))}
+               </Stepper>
+               <React.Fragment>
+                  {activeStep === steps.length ? (
+                     <div className={classes.fim}>
+                        <Typography variant="h6" gutterBottom>
+                           Muito obrigado por se cadastrar.
+                        </Typography>
+                        <Button
+                           onClick={handleLogin}
+                           variant="contained"
+                           color="primary"
+                           size="large"
+                           >
+                              Fazer login
+                        </Button>
+                     </div>
+   
+                  ) : (
+                     <React.Fragment>
+                        {getStepContent(activeStep)}
+                        <div className={classes.buttons}>
+                           <Button
+                              disabled={activeStep === 0}
+                              onClick={handleBack}
+                              className={classes.backButton}
+                           >
+                              Voltar
+                           </Button>
+                           <Button variant="contained" className="buttonNext" color="primary" onClick={handleNext}>
+                              {activeStep === steps.length - 1 ? 'Finalizar' : 'Próximo'}
+                           </Button>
+                        </div>
+                     </React.Fragment>
+                  )}
+               </React.Fragment>
             </form>
-         </div>
-      </div>
+         </Paper>
+      </main>
    )
 }

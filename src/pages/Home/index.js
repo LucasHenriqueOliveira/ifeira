@@ -9,6 +9,8 @@ import Select from '@material-ui/core/Select';
 import Grid from '@material-ui/core/Grid';
 import { useSnackbar } from 'notistack';
 import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 
 import api from '../../services/api';
 import './styles.css';
@@ -34,6 +36,9 @@ const useStyles = makeStyles((theme) => ({
         marginLeft: 0,
         marginBottom: 0,
         marginTop: 3,
+    },
+    city: {
+        textTransform: 'capitalize'
     }
 }));
 
@@ -48,80 +53,72 @@ export default function Home() {
     const [neighborhoods, setNeighborhoods] = useState([]);
 
     const handleChangeUf = (uf) => {
+        let ufLowerCase = uf.toLowerCase();
         setUf(uf);
         
-        api.get('regioes/municipios/' + uf).then(response => {
-            setCities(response);
+        api.get('regioes/municipios/' + ufLowerCase).then(response => {
+            let municipios = [];
+            response.data.forEach(element => {
+                municipios.push({ id: element._id, name: capitalize(element.nome_municipio)});
+            });
+            setCities(municipios);
         });
-
-        //setCities([{'id': 1, 'name': 'Belo Horizonte'}, {'id': 2, 'name': 'São Paulo'}]);
     };
 
-    const handleChangeCity = (city) => {
-        setCity(city);
-        
-        api.get('regioes/bairros/' + city).then(response => {
-            setNeighborhoods(response);
-        });
+    function capitalize(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
 
-        //setNeighborhoods([{'id': 1, 'name': 'Centro'}, {'id': 2, 'name': 'Santo Antônio'}]);
+    const handleChangeCity = (city) => {
+        if (city) {
+            setCity(city);
+        
+            api.get('regioes/bairros/' + city.id).then(response => {
+                let bairros = [];
+                response.data.forEach(element => {
+                    bairros.push({ id: element._id, name: capitalize(element.nome)});
+                });
+                setNeighborhoods(bairros);
+            });
+        }
     };
 
 
     async function handleSearch(event) {
+        event.preventDefault();
         
-        /*
         if(!neighborhood) {
-            enqueueSnackbar('Selecione um bairro!', { 
-                variant: 'info',
+            enqueueSnackbar('Informe um bairro!', { 
+                variant: 'warning',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                }
             });
             return false;
         }
-        */
-
-        let response = [{
-            "id": 1,
-            "nomeDaBarraca": "Barraca Brás",
-            "email": "barraca.bras@ig.com.br",
-            "telefonePrincipal": "(11)96323-4854",
-            "telefonesWhatsapp": [
-              "(11)96323-4854",
-              "(11)94354-6555",
-              "(11)94954-3323"
-            ],
-            "produtos": [
-              "legumes",
-              "frutas nacionais",
-              "frutas importadas"
-            ],
-            "tipos": [
-              "orgânicos",
-              "não orgânicos"
-            ],
-            "bairrosEntrega": [
-              "Jardins",
-              "Vila Mariana",
-              "Moema"
-            ],
-            "endereco": "Rua Além Paraíba, 120, Centro, São Paulo"
-        }];
-        
-        history.push('/list', { detail: response});
-        return false;
 
         try {
-            await api.get('feirantes/bairro/' + neighborhood).then(response => {
-                if(response.length) {
-                    history.push('/list', { detail: response});
+            await api.get('feirantes/bairro/' + neighborhood.id).then(response => {
+                if(response.data.length) {
+                    history.push('/list', { detail: response.data});
                 } else {
                     enqueueSnackbar('Não foi encontrado feirante para este bairro!', { 
                         variant: 'info',
+                        anchorOrigin: {
+                            vertical: 'top',
+                            horizontal: 'center',
+                        }
                     });
                 }
             });
         } catch(error) {
             enqueueSnackbar('Erro ao retornar os feirantes!', { 
                 variant: 'error',
+                anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'center',
+                }
             });
         }
     }
@@ -164,34 +161,32 @@ export default function Home() {
                                     </Grid>
                                     <Grid item xs={12} sm={10}>
                                         <FormControl variant="outlined" className={classes.select}>
-                                            <InputLabel id="labelCity">Cidade</InputLabel>
-                                            <Select
-                                                labelId="labelCity"
+                                            <Autocomplete
+                                                id="cidades"
+                                                options={cities}
+                                                getOptionLabel={(option) => option.name}
+                                                style={{ width: '100%' }}
                                                 value={city}
-                                                onChange={e => handleChangeCity(e.target.value)}
-                                            >
-                                                {cities.map((city) => (
-                                                <MenuItem key={city.id} value={city.id}>
-                                                {city.name}
-                                                </MenuItem>
-                                                ))}
-                                            </Select>
+                                                onChange={(event, newValue) => {
+                                                    handleChangeCity(newValue);
+                                                }}
+                                                renderInput={(params) => <TextField {...params} label="Cidade" variant="outlined" />}
+                                            />
                                         </FormControl>
                                     </Grid>
                                     <Grid item xs={12}>
                                         <FormControl variant="outlined" className={classes.select}>
-                                            <InputLabel id="labelNeighborhood">Bairro</InputLabel>
-                                            <Select
-                                                labelId="labelNeighborhood"
+                                            <Autocomplete
+                                                id="bairros"
+                                                options={neighborhoods}
+                                                getOptionLabel={(option) => option.name}
+                                                style={{ width: '100%' }}
                                                 value={neighborhood}
-                                                onChange={e => setNeighborhood(e.target.value)}
-                                            >
-                                                {neighborhoods.map((neighborhood) => (
-                                                <MenuItem key={neighborhood.id} value={neighborhood.id}>
-                                                    {neighborhood.name}
-                                                </MenuItem>
-                                                ))}
-                                            </Select>
+                                                onChange={(event, newValue) => {
+                                                    setNeighborhood(newValue);
+                                                }}
+                                                renderInput={(params) => <TextField {...params} label="Bairro" variant="outlined" />}
+                                            />
                                         </FormControl>
                                     </Grid>
                                 </Grid>

@@ -98,12 +98,15 @@
 }
 
 .register-container .content form .input-group label {
-   margin-top: 7px;
    z-index: 1;
 }
 
 .register-container .MuiFormLabel-root.Mui-focused {
    color: rgba(0, 0, 0, 0.54) !important;
+}
+
+.makeStyles-selectUF-2 .MuiFormLabel-root {
+   margin-top: 7px;
 }
 
 .makeStyles-selectUF-2 .MuiFormLabel-root,
@@ -129,6 +132,14 @@
    margin-left: 10px !important;
 }
 
+.MuiStepIcon-root.MuiStepIcon-active,
+.MuiStepIcon-root.MuiStepIcon-completed {
+   color: var(--primary-color) !important;
+}
+
+.MuiCheckbox-colorSecondary.Mui-checked {
+   color: var(--primary-color) !important;
+}
 
 @media (max-width: 1280px) {}
 
