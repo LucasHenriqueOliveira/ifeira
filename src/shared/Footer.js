@@ -27,7 +27,7 @@ export default function Footer() {
         <React.Fragment>
             <footer className={classes.footer}>
                 <Typography variant="h6" align="center" gutterBottom>
-                    iFeira
+                    Meu Feirante
                 </Typography>
                 <Typography variant="subtitle1" align="center" color="textSecondary" component="p">
                     A sua feira em casa!
