@@ -24,7 +24,12 @@ import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import SearchIcon from '@material-ui/icons/Search';
+import FormLabel from '@material-ui/core/FormLabel';
+import FormGroup from '@material-ui/core/FormGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
 import './styles.css';
+import toldImg from '../../assets/told.svg';
 
 const useStyles = makeStyles((theme) => ({
 	heroContent: {
@@ -43,12 +48,18 @@ const useStyles = makeStyles((theme) => ({
 		height: '100%',
 		display: 'flex',
 		flexDirection: 'column',
+		textAlign: 'center'
+	},
+	cardActions: {
+		textAlign: 'center',
+		display: 'block'
 	},
 	cardMedia: {
 		paddingTop: '56.25%', // 16:9
 	},
 	cardContent: {
 		flexGrow: 1,
+		marginTop: 10
 	},
 	buttons: {
 		textAlign: 'center',
@@ -74,6 +85,16 @@ const useStyles = makeStyles((theme) => ({
 	},
 	heading: {
 		fontSize: 15
+	},
+	told: {
+		width: '100%',
+    	marginBottom: -15
+	},
+	gridBarraca: {
+		height: '100%'
+	},
+	produto: {
+		marginTop: 15
 	}
 }));
 
@@ -84,13 +105,19 @@ export default function List() {
 	const [city, setCity] = useState('');
 	const [uf, setUf] = useState('');
 	const [neighborhood, setNeighborhood] = useState('');
-	const [product, setProduct] = useState([]);
-	const [type, setType] = useState([]);
 	const [cities, setCities] = useState([]);
 	const [neighborhoods, setNeighborhoods] = useState([]);
 	const [products, setProducts] = useState([]);
 	const [types, setTypes] = useState([]);
 	const [feirantes, setFeirantes] = useState(location.state.detail);
+	
+	const handleChangeProduto = (produto) => {
+		setProducts(products.map(item => item.id === produto.id ? {...item, checked : !produto.checked} : item ));
+	};
+
+	const handleChangeTipo = (tipo) => {
+		setTypes(types.map(item => item.id === tipo.id ? {...item, checked : !tipo.checked} : item ));
+	};
 
 	const states = [
         'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG',
@@ -99,11 +126,19 @@ export default function List() {
 	
 	useEffect(() => {
         api.get('produtos').then(response => {
-            setProducts(response.data);
+			let produtos = [];
+			response.data.forEach(element => {
+				produtos.push({id: element._id, checked: false, nome: element.descricao});
+			});
+            setProducts(produtos);
 		});
 		
 		api.get('tiposProdutos').then(response => {
-            setTypes(response.data);
+            let tipos_produto = [];
+			response.data.forEach(element => {
+				tipos_produto.push({id: element._id, checked: false, nome: element.descricao});
+			});
+			setTypes(tipos_produto);
 		});
     }, []);
 
@@ -150,8 +185,8 @@ export default function List() {
 			city,
 			uf,
 			neighborhood,
-			product,
-			type
+			//product,
+			//type
 		};
 
 		try {
@@ -242,43 +277,33 @@ export default function List() {
 									/>
 								</FormControl>
 							</Grid>
-							<Grid item xs={12} sm={6} md={6}>
-								<FormControl>
-								<InputLabel id="labelProducts">Produto</InputLabel>
-								<Select
-									className="products"
-									labelId="labelProducts"
-									multiple
-									value={product}
-									onChange={e => setProduct(e.target.value)}
-									input={<Input />}
-								>
+							<Grid item xs={12} className={classes.produto}>
+								<FormLabel component="legend">Produto</FormLabel>
+								<FormGroup row>
 									{products.map((product) => (
-										<MenuItem key={product._id} value={product._id}>
-										{product.descricao}
-										</MenuItem>
+										<FormControlLabel
+											key={product.id}
+											control={<Checkbox checked={product.checked} 
+											onClick={() => handleChangeProduto(product)} 
+											name={product.nome} />}
+											label={product.nome}
+										/>
 									))}
-								</Select>
-								</FormControl>
+								</FormGroup>
 							</Grid>
-							<Grid item xs={12} sm={6} md={6}>
-								<FormControl>
-								<InputLabel id="labelType">Tipo</InputLabel>
-								<Select
-									className="type"
-									labelId="labelType"
-									multiple
-									value={type}
-									onChange={e => setType(e.target.value)}
-									input={<Input />}
-								>
+							<Grid item xs={12}>
+								<FormLabel component="legend">Tipo</FormLabel>
+								<FormGroup row>
 									{types.map((type) => (
-										<MenuItem key={type._id} value={type._id}>
-										{type.descricao}
-										</MenuItem>
+										<FormControlLabel
+											key={type.id}
+											control={<Checkbox checked={type.checked} 
+											onClick={() => handleChangeTipo(type)} 
+											name={type.nome} />}
+											label={type.nome}
+										/>
 									))}
-								</Select>
-								</FormControl>
+								</FormGroup>
 							</Grid>
 							<Grid item xs={12} sm={12} md={12} className={classes.buttons}>
 								<Button
@@ -297,11 +322,13 @@ export default function List() {
 			</ExpansionPanel>
 			
 			<Container className={classes.cardGrid} maxWidth="lg">
-			<Grid container spacing={2}>
+			<Grid container spacing={3}>
 				{feirantes.map((feirante) => (
-				<Grid item key={feirante._id} xs={12} sm={6} md={4}>
+				<Grid item key={feirante._id} xs={12} sm={6} md={4} className={classes.gridBarraca}>
+					<img src={toldImg} alt="Feira" className={classes.told} /> 
 					<Card className={classes.card}>
 					<CardContent className={classes.cardContent}>
+						
 						<Typography gutterBottom variant="h5" component="h2">
 						{feirante.nomeDaBarraca}
 						</Typography>
@@ -370,7 +397,7 @@ export default function List() {
 							</div>
 						)}
 					</CardContent>
-					<CardActions>
+					<CardActions className={classes.cardActions}>
 						<Button size="small" onClick={() => handleMessage(feirante.telefonePrincipal)} color="primary">
 							Envie uma mensagem
 						</Button>
