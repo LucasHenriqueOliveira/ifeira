@@ -270,7 +270,9 @@ export default function Register() {
       <main className="register-container">
          <Paper className="content">
             <section>
-               <img src={logoImg} alt="Register"/>
+               <Link to="/"> 
+                  <img src={logoImg} alt="Register"/>
+               </Link>
 
                <h1>Cadastro</h1>
                <p>Faça seu cadastro, entre na plataforma e seja visto por milhares de pessoas.</p>
