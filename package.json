@@ -1,5 +1,5 @@
 {
-  "name": "bethehero",
+  "name": "meufeirante",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -15,6 +15,7 @@
     "react-dom": "^16.13.1",
     "react-hooks-helper": "^1.6.0",
     "react-icons": "^3.9.0",
+    "react-input-mask": "^2.0.4",
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.1"
   },

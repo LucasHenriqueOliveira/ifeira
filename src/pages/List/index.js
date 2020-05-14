@@ -110,6 +110,11 @@ export default function List() {
 	const [products, setProducts] = useState([]);
 	const [types, setTypes] = useState([]);
 	const [feirantes, setFeirantes] = useState(location.state.detail);
+	const [expanded, setExpanded] = useState(false);
+
+	const handleChange = (panel) => (event, isExpanded) => {
+		setExpanded(isExpanded ? panel : false);
+	};
 	
 	const handleChangeProduto = (produto) => {
 		setProducts(products.map(item => item.id === produto.id ? {...item, checked : !produto.checked} : item ));
@@ -140,6 +145,29 @@ export default function List() {
 			});
 			setTypes(tipos_produto);
 		});
+
+		let municipio = feirantes[0].bairrosDeEntrega[0].municipio;
+		let ufLowerCase = municipio.split(':')[0];
+		let uf = ufLowerCase.toUpperCase();
+		setUf(uf);
+		
+        api.get('regioes/municipios/' + ufLowerCase).then(response => {
+            let municipios = [];
+            response.data.forEach(element => {
+                municipios.push({ id: element._id, name: capitalize(element.nome_municipio)});
+            });
+            setCities(municipios);
+		});
+		setCity({id:municipio, name: capitalize(municipio.split(':')[2])});
+
+		api.get('regioes/bairros/' + municipio).then(response => {
+			let bairros = [];
+			response.data.forEach(element => {
+				bairros.push({ id: element._id, name: capitalize(element.nome)});
+			});
+			setNeighborhoods(bairros);
+		});
+
     }, []);
 
 	const handleChangeUf = (uf) => {
@@ -161,7 +189,8 @@ export default function List() {
 
     const handleChangeCity = (city) => {
         if (city) {
-            setCity(city);
+			setCity(city);
+			console.log(city);
         
             api.get('regioes/bairros/' + city.id).then(response => {
                 let bairros = [];
@@ -172,31 +201,58 @@ export default function List() {
             });
         }
 	};
-	
-	const handleChangeNeighborhood = (neighborhood) => {
-		console.log(neighborhood);
-		//setNeighborhood(neighborhood);
-	};
+
+	const formatPhone = (tel) => {
+		return "(" + tel.substring(0, 2) + ") " + tel.substring(2, 7) + "-" + tel.substring(7, 11);
+	}
 
 	async function handleSearch(event) {
 		event.preventDefault();
 
+		let produtos = [];
+		products.forEach(element => {
+			if (element.checked) {
+				produtos.push(element.id);
+			}
+		});
+
+		let tipos = [];
+		types.forEach(element => {
+			if (element.checked) {
+				tipos.push(element.id);
+			}
+		});
+
 		const data = {
-			city,
-			uf,
-			neighborhood,
-			//product,
-			//type
+			municipio: city.id,
 		};
 
-		try {
-			const response = await api.post('feirantes', data);
+		if (neighborhood) {
+			data.bairros = [neighborhood.id];
+		}
 
-			if(response.length) {
-				setFeirantes(response);
+		if (produtos.length) {
+			data.produtos = produtos;
+		}
+
+		if (tipos.length) {
+			data.tiposDeProdutos = tipos;
+		}
+
+		try {
+			const response = await api.post('pesquisa', data);
+
+			if(response.data.length) {
+				setExpanded(false);
+				setFeirantes(response.data);
 			} else {
-				enqueueSnackbar('Não foi encontrado feirante para este bairro!', { 
-					variant: 'info',
+				setFeirantes([]);
+				enqueueSnackbar('Não foi encontrado feirante para esta pesquisa!', { 
+					variant: 'warning',
+					anchorOrigin: {
+						vertical: 'top',
+						horizontal: 'center',
+					}
 				});
 			}
 
@@ -215,7 +271,7 @@ export default function List() {
 		<div>
 		<Header />
 		<main>
-			<ExpansionPanel>
+			<ExpansionPanel expanded={expanded === 'panel'} onChange={handleChange('panel')}>
 				<ExpansionPanelSummary
 				expandIcon={<ExpandMoreIcon />}
 				aria-controls="panel1a-content"
@@ -337,12 +393,12 @@ export default function List() {
 						</Typography>
 						
 						<Typography className={classes.legend}>
-							Telefones
+							Telefone
 						</Typography>
 						<div>
 						{(feirante.telefonesWhatsapp).map((telefone, index) => (
 							<Typography key={index} className="text">
-								{telefone}
+								{formatPhone(telefone)}
 								{ ((feirante.telefonesWhatsapp.length - 1) !== index) ? ' / ': '' }
 							</Typography>
 						))}

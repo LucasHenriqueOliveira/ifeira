@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
+import InputMask from "react-input-mask";
 
 const useStyles = makeStyles((theme) => ({
 	formControl: {
@@ -14,9 +15,15 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-export default function Dados({ setForm, formData }) {
-	const { nome, email, whatsapp, senha } = formData;
+export default function Dados({ setForm, formData, onChangeTel }) {
+	const { nome, email, senha } = formData;
 	const classes = useStyles();
+	const [tel, setTel] = useState(localStorage.getItem('tel'));
+
+	const handleChange = (event) => {
+		setTel(event);
+		onChangeTel(event);
+	}
 
 	return (
 		<React.Fragment>
@@ -46,15 +53,15 @@ export default function Dados({ setForm, formData }) {
 					/>
 				</Grid>
 				<Grid item xs={12}>
-                    <TextField 
-                        required
-                        id="whatsapp"
-						name="whatsapp"
-                        label="WhatsApp"
-                        fullWidth
-                        value={whatsapp}
-                        onChange={setForm}
-                    />
+					<InputMask
+						mask="(99) 99999-9999"
+						value={tel}
+						disabled={false}
+						onChange={e => handleChange(e.target.value)}
+						maskChar=" "
+						>
+						{() => <TextField required label="WhatsApp" fullWidth name="whatsapp" />}
+					</InputMask>
 				</Grid>
 				<Grid item xs={12}>
 					<TextField

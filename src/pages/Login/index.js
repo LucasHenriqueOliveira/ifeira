@@ -5,7 +5,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import { useSnackbar } from 'notistack';
 import api from '../../services/api';
-
+import Auth from '../../shared/auth';
 import './styles.css';
 
 import logoImg from '../../assets/logo.png';
@@ -27,6 +27,11 @@ export default function Login() {
    const [email, setEmail] = useState('');
    const [password, setPassword] = useState('');
    const history = useHistory();
+   const isLoggedIn = Auth.isLoggedIn();
+
+   if (isLoggedIn) {
+      history.push('/edit');
+   }
 
    const classes = useStyles();
 
@@ -41,9 +46,10 @@ export default function Login() {
       try {
          await api.post('sessions', data).then(response => {
             if(response.data.hasOwnProperty('token')) {
-               localStorage.setItem('dados', response.data.dados);
+               let result = JSON.stringify(response.data.dados);
+               localStorage.setItem('dados', result);
                localStorage.setItem('token', response.data.token);
-               history.push('/profile');
+               history.push('/edit');
             } else {
                enqueueSnackbar('Feirante não encontrado!', { 
                   variant: 'error',

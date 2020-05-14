@@ -4,7 +4,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import List from './pages/List';
-import Profile from './pages/Profile';
+import Feirante from './pages/Feirante';
 import Edit from './pages/Edit';
 
 export default function Routes() {
@@ -12,11 +12,11 @@ export default function Routes() {
       <BrowserRouter>
          <Switch>
             <Route path="/" exact component={Home} />
-            <Route path="/login" exact component={Login} />
+            <Route path="/login" component={Login} />
             <Route path='/register' component={Register} />
             <Route path='/list' component={List} />
-            <Route path='/profile/:id' component={Profile} />
-            <Route path='/edit/:id' component={Edit} />
+            <Route path='/feirante/:id' component={Feirante} />
+            <Route path='/edit' component={Edit} />
          </Switch>
       </BrowserRouter>
    )

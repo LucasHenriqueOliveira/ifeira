@@ -21,6 +21,7 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import { Link } from 'react-router-dom';
+import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles((theme) => ({
 	formControl: {
@@ -55,6 +56,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Bairros({ setForm, formData, onChangeBairros }) {
     const { endereco } = formData;
+    const { enqueueSnackbar } = useSnackbar();
     const [cities, setCities] = useState([]);
     const [neighborhoods,setNeighborhoods] = useState([]);
     const [city, setCity] = useState('');
@@ -63,7 +65,12 @@ export default function Bairros({ setForm, formData, onChangeBairros }) {
     const classes = useStyles();
     const [checked, setChecked] = React.useState(false);
     const [open, setOpen] = React.useState(false);
-    const [bairrosEntrega, setBairrosEntrega] = useState([]);
+    let list = localStorage.getItem('bairros');
+    let bairros = [];
+    if (list) {
+        bairros = JSON.parse(list);
+    }
+    const [bairrosEntrega, setBairrosEntrega] = useState(bairros);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -115,6 +122,15 @@ export default function Bairros({ setForm, formData, onChangeBairros }) {
 
     const handleAdd = () => {
         let bairro = { id: neighborhood.id, uf: uf, city: city.name, neighborhood: neighborhood.name};
+        let list = localStorage.getItem('bairros');
+        if (list.length) {
+            bairros = JSON.parse(list);
+            bairros.push(bairro);
+            localStorage.setItem('bairros', JSON.stringify(bairros));
+        } else {
+            localStorage.setItem('bairros', JSON.stringify(formData.bairros));
+        }
+        
         setBairrosEntrega(bairrosEntrega => [...bairrosEntrega, bairro]);
         setUf('');
         setCity('');
@@ -128,6 +144,7 @@ export default function Bairros({ setForm, formData, onChangeBairros }) {
             return obj.id !== bairro.id;
         });
         setBairrosEntrega(bairros);
+        localStorage.setItem('bairros', JSON.stringify(bairros));
         onChangeBairros(bairro, 'remove');
     }
 

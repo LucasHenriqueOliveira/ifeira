@@ -138,7 +138,7 @@ export default function Register() {
    const getStepContent = (step) => {
       switch (step) {
          case 0:
-            return <Dados {...props} />;
+            return <Dados {...props}  onChangeTel={handleChangeTel} />;
          case 1:
             return <Bairros {...props} onChangeBairros={handleChangeBairros} />;
          case 2:
@@ -146,6 +146,11 @@ export default function Register() {
          default:
             throw new Error('Unknown step');
       }
+   }
+
+   const handleChangeTel = (tel) => {
+      formData.whatsapp = tel;
+      localStorage.setItem('tel', tel);
    }
 
    const handleChangeBairros = (arr, type) => {
@@ -204,7 +209,7 @@ export default function Register() {
 
       if (!formData.nome || !formData.email || !formData.whatsapp || !formData.senha 
          || formData.bairros.length === 0 || formData.products.length === 0 || formData.types.length === 0) {
-            enqueueSnackbar('Favor preencher os dados obrigatórios!', { 
+            enqueueSnackbar('Favor preencher os campos obrigatórios!', { 
                variant: 'error',
                anchorOrigin: {
                   vertical: 'top',
@@ -233,11 +238,13 @@ export default function Register() {
          bairros.push(element.id);
       });
 
+      let tel = formData.whatsapp.replace(/[^a-zA-Z0-9 ]/g, "").replace(/\s/g, '');
+
       const data = {
          nomeDaBarraca: formData.nome,
          email: formData.email,
-         telefonePrincipal: formData.whatsapp,
-         telefonesWhatsapp: [formData.whatsapp],
+         telefonePrincipal: tel,
+         telefonesWhatsapp: [tel],
          produtos: produtos,
          tiposDeProdutos: tipos,
          bairrosDeEntrega: bairros,
@@ -247,6 +254,7 @@ export default function Register() {
 
       try {
          await api.post('feirante', data).then(response => {
+            localStorage.removeItem('tel');
 				setActiveStep(activeStep + 1);
 			});
       } catch(error) {
