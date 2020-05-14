@@ -2,8 +2,8 @@
 FROM node:14.2.0-stretch as build
 WORKDIR /app
 ENV PATH /ifeira/node_modules/.bin:$PATH
-COPY package.json ./
-RUN npm install --verbose
+COPY package*.json ./
+RUN npm i --production --verbose
 RUN npm install react-scripts@3.4.1 
 COPY . ./
 RUN npm run build
